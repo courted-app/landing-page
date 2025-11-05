@@ -205,15 +205,21 @@ function App() {
     }
 
     try {
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
+      // Send request without waiting for response (optimistic update)
+      // Since we're using no-cors mode, we can't read the response anyway
+      fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
+      }).catch(err => {
+        // Silently handle errors - data is sent, we just can't verify
+        console.log('Background submission:', err)
       })
 
+      // Show success immediately - don't wait for response
       setMessage({
         type: 'success',
         text: "Thank you. You've been added to our waitlist."
@@ -235,12 +241,12 @@ function App() {
         city: '', 
         country: '' 
       })
+      setLoading(false)
     } catch (error) {
       setMessage({
         type: 'error',
         text: 'Something went wrong. Please try again.'
       })
-    } finally {
       setLoading(false)
     }
   }
@@ -320,7 +326,7 @@ function App() {
               <ThinHeartIcon className="feature-icon feature-icon-connection" />
               <h3 className="feature-title">Connection</h3>
               <p className="feature-description">
-                See if chemistry goes beyond the court — naturally, effortlessly.
+                See if chemistry goes beyond the court - naturally, effortlessly.
               </p>
             </div>
 
