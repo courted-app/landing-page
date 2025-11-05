@@ -304,7 +304,7 @@ function App() {
             <span className="section-label">Match.</span>
             <span className="section-label">Courted.</span>
           </div>
-          <p className="tagline">The first AI-powered pickleball matching app designed to help you find your perfect fit.</p>
+          <p className="tagline">The first AI-powered pickleball matching app designed to help you find your perfect match.</p>
           
 
           <div className="features-grid">
@@ -328,7 +328,7 @@ function App() {
               <ThinHeartIcon className="feature-icon feature-icon-connection" />
               <h3 className="feature-title">Connection</h3>
               <p className="feature-description">
-                See if chemistry goes beyond the court — naturally, effortlessly.
+                See if chemistry goes beyond the court - naturally, effortlessly.
               </p>
             </div>
           </div>
@@ -342,7 +342,7 @@ function App() {
             <FiArrowDown className="arrow-icon" />
           </button>
 
-          <p className="consent-text">By joining, you agree we can email you about your matches and product updates.</p>
+          <p className="consent-text">By joining, you agree we can email you about your matches and product updates. Beta matching currently is limited to Greater Toronto Area. </p>
         </div>
       </section>
 
@@ -374,7 +374,7 @@ function App() {
                   I graduated with a Masters in Computer Science from USC Viterbi School of Engineering and currently work as a Senior Software Engineer at a unicorn tech company in San Francisco. Before that, I was a D1 NCAA soccer player on a full-ride scholarship.
                 </p>
                 <p className="co-founder-text">
-                  In college, I built a website that recommends restaurants based on dietary restrictions, and that's when I realized I love creating products that help people connect in real life. I found pickleball, fell in love with the community, and saw a massive gap — finding the right partner shouldn't be left to chance.
+                  In college, I built a website that recommends restaurants based on dietary restrictions, and that's when I realized I love creating products that help people connect in real life. I found pickleball, fell in love with the community, and saw a massive gap - finding the right partner shouldn't be left to chance.
                 </p>
               </div>
             </div>
