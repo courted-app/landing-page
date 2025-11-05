@@ -304,7 +304,7 @@ function App() {
             <span className="section-label">Match.</span>
             <span className="section-label">Courted.</span>
           </div>
-          <p className="tagline">The first AI-powered pickleball matching app designed to help you find your perfect match.</p>
+          <p className="tagline">The #1 AI full-stack pickleball partner matching app. Spend less time searching, more time playing.</p>
           
 
           <div className="features-grid">
@@ -317,18 +317,19 @@ function App() {
             </div>
 
             <div className="feature-card">
-              <IoTrophyOutline className="feature-icon feature-icon-coach" />
-              <h3 className="feature-title">Coach</h3>
-              <p className="feature-description">
-                Train smarter by matching with coaches who fit your level and schedule.
-              </p>
-            </div>
-
-            <div className="feature-card">
               <ThinHeartIcon className="feature-icon feature-icon-connection" />
               <h3 className="feature-title">Connection</h3>
               <p className="feature-description">
-                See if chemistry goes beyond the court - naturally, effortlessly.
+                See if chemistry goes beyond the court — naturally, effortlessly.
+              </p>
+            </div>
+
+            <div className="feature-card feature-card-coming-soon">
+              <span className="coming-soon-badge">Coming Soon</span>
+              <IoTrophyOutline className="feature-icon feature-icon-coach" />
+              <h3 className="feature-title">Coach</h3>
+              <p className="feature-description">
+                Match with coaches who fit your level and schedule.
               </p>
             </div>
           </div>
@@ -390,7 +391,7 @@ function App() {
                 <PickleballAnimation />
               </div>
               <h2 className="success-title">Welcome to the waitlist!</h2>
-              <p className="success-message">You're officially in the rally — your ideal partner is warming up.</p>
+              <p className="success-message">You're officially in the rally - your ideal partner is warming up.</p>
             </div>
           </div>
         ) : (

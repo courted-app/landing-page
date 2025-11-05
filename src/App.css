@@ -185,11 +185,11 @@
 }
 
 .feature-icon-coach {
-  color: #C19A3B;
+  color: #0B3D2E;
 }
 
 .feature-icon-connection {
-  color: #0B3D2E;
+  color: #C19A3B;
 }
 
 .feature-title {
@@ -207,6 +207,28 @@
   opacity: 0.7;
   line-height: 1.4;
   margin: 0;
+}
+
+.feature-card-coming-soon {
+  opacity: 0.85;
+  position: relative;
+}
+
+.coming-soon-badge {
+  position: absolute;
+  top: -8px;
+  right: 12px;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #666666;
+  background: #f8f8f8;
+  padding: 4px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .subtagline {
@@ -731,6 +753,11 @@ select.form-input:focus {
     margin-bottom: 6px;
   }
 
+  .coming-soon-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+
   .feature-description {
     font-size: 0.72rem;
     line-height: 1.3;
@@ -896,6 +923,11 @@ select.form-input:focus {
     margin-bottom: 5px;
   }
 
+  .coming-soon-badge {
+    font-size: 0.55rem;
+    padding: 2px 6px;
+  }
+
   .feature-description {
     font-size: 0.7rem;
     line-height: 1.25;
@@ -1013,6 +1045,11 @@ select.form-input:focus {
     font-size: 0.95rem;
   }
 
+  .coming-soon-badge {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+
   .feature-description {
     font-size: 0.78rem;
   }
@@ -1067,6 +1104,11 @@ select.form-input:focus {
   .feature-title {
     font-size: 0.75rem;
     margin-bottom: 4px;
+  }
+
+  .coming-soon-badge {
+    font-size: 0.5rem;
+    padding: 1px 5px;
   }
 
   .feature-description {
