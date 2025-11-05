@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { FiArrowDown, FiMail, FiUser, FiCalendar, FiMapPin, FiGlobe, FiAward, FiHome, FiUsers } from 'react-icons/fi'
+import { FiArrowDown, FiMail, FiUser, FiCalendar, FiMapPin, FiGlobe, FiAward, FiHome, FiUsers, FiInstagram } from 'react-icons/fi'
 import { IoCheckmarkCircleOutline, IoTrophyOutline } from 'react-icons/io5'
 import logo from './assets/images/courted-long-logo.png'
 import christinaImg from './assets/images/christie-co-founder.png'
@@ -355,6 +355,9 @@ function App() {
                 <p className="co-founder-text">
                   In college, Stella built a website that recommends restaurants based on dietary restrictions, and that's when she realized her love creating products that help people connect in real life. Stella found pickleball, fell in love with the community, and saw a massive gap - finding the right partner shouldn't be left to chance.
                 </p>
+                <p className="co-founder-text">
+                  Let's find your perfect match!
+                </p>
               </div>
             </div>
           </div>
@@ -574,7 +577,7 @@ function App() {
 
             <div className="form-group full-width">
               <label className="form-label">
-                <span>Type of partner<span className="label-hint">(Select all that apply)</span></span>
+                <span>Type of Rallies <span className="label-hint">(Select all that apply)</span></span>
               </label>
               <div className="checkbox-group">
                 <label className="checkbox-option">
@@ -602,7 +605,7 @@ function App() {
 
             <div className="form-group full-width">
               <label className="form-label">
-                <span>What kind of partner are you looking for? <span className="label-hint">(Select all that apply)</span></span>
+                <span>Type of Partner <span className="label-hint">(Select all that apply)</span></span>
               </label>
               <div className="checkbox-group">
                 <label className="checkbox-option">
@@ -716,6 +719,26 @@ function App() {
           </>
         )}
       </section>
+
+      <footer className="footer">
+        <div className="footer-container">
+          <div className="footer-content">
+            <div className="footer-links">
+              <a href="mailto:info@courtedapp.com" className="footer-link">
+                <FiMail className="footer-icon" />
+                <span>Contact Us</span>
+              </a>
+              <a href="https://www.instagram.com/courted.ai/" target="_blank" rel="noopener noreferrer" className="footer-link">
+                <FiInstagram className="footer-icon" />
+                <span>Instagram</span>
+              </a>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <p className="footer-copyright">© 2025 Courted. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
