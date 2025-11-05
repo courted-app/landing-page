@@ -581,7 +581,7 @@ function App() {
                     checked={formData.lookingFor.includes('Drilling')}
                     onChange={handleChange}
                   />
-                  <span>Drill</span>
+                  <span>Drilling</span>
                 </label>
                 <label className="checkbox-option">
                   <input
