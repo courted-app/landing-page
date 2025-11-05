@@ -243,7 +243,7 @@ function App() {
           country: '' 
         })
         setLoading(false)
-      }, 1500) // Wait 1.5 seconds before showing success
+      }, 1000)
     } catch (error) {
       setMessage({
         type: 'error',
