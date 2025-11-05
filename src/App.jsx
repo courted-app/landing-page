@@ -219,29 +219,31 @@ function App() {
         console.log('Background submission:', err)
       })
 
-      // Show success immediately - don't wait for response
-      setMessage({
-        type: 'success',
-        text: "Thank you. You've been added to our waitlist."
-      })
-      setIsSubmitted(true)
-      setFormData({ 
-        name: '', 
-        email: '', 
-        gender: '', 
-        birthday: '', 
-        duprRating: '', 
-        duprId: '',
-        lookingToDate: '',
-        whenDoYouPlay: [],
-        lookingFor: [],
-        dateGenderPreference: [],
-        partnerType: [],
-        currentClub: '', 
-        city: '', 
-        country: '' 
-      })
-      setLoading(false)
+      // Show success after a brief delay for better UX
+      setTimeout(() => {
+        setMessage({
+          type: 'success',
+          text: "Thank you. You've been added to our waitlist."
+        })
+        setIsSubmitted(true)
+        setFormData({ 
+          name: '', 
+          email: '', 
+          gender: '', 
+          birthday: '', 
+          duprRating: '', 
+          duprId: '',
+          lookingToDate: '',
+          whenDoYouPlay: [],
+          lookingFor: [],
+          dateGenderPreference: [],
+          partnerType: [],
+          currentClub: '', 
+          city: '', 
+          country: '' 
+        })
+        setLoading(false)
+      }, 1500) // Wait 1.5 seconds before showing success
     } catch (error) {
       setMessage({
         type: 'error',
