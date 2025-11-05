@@ -16,7 +16,27 @@
 
 // Replace with your Google Sheet ID (found in the URL)
 const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
-const SHEET_NAME = 'Waitlist'; // Name of the sheet tab
+const SHEET_NAME = 'Waitlist'; // Name of the sheet tab - updated with new headers
+
+// Expected headers in the correct order
+const EXPECTED_HEADERS = [
+  'Timestamp', 
+  'Name', 
+  'Email', 
+  'Gender', 
+  'Age Range', 
+  'Match Same Age Group',
+  'DUPR Rating',
+  'DUPR ID',
+  'Looking to Date',
+  'When Do You Play',
+  'Type of Partner',
+  'Partner Type',
+  'Date Gender Preference',
+  'Current Club', 
+  'City', 
+  'Country'
+];
 
 function doPost(e) {
   try {
@@ -56,50 +76,32 @@ function doPost(e) {
     
     let sheet = ss.getSheetByName(SHEET_NAME);
     
-    // If sheet doesn't exist, create it
+    // If sheet doesn't exist, create it with new headers
     if (!sheet) {
       sheet = ss.insertSheet(SHEET_NAME);
-      // Add headers
-      sheet.getRange(1, 1, 1, 15).setValues([[
-        'Timestamp', 
-        'Name', 
-        'Email', 
-        'Gender', 
-        'Birthday', 
-        'DUPR Rating',
-        'DUPR ID',
-        'Looking to Date',
-        'When Do You Play',
-        'Type of Partner',
-        'Partner Type',
-        'Date Gender Preference',
-        'Current Club', 
-        'City', 
-        'Country'
-      ]]);
-      sheet.getRange(1, 1, 1, 15).setFontWeight('bold');
+      sheet.getRange(1, 1, 1, EXPECTED_HEADERS.length).setValues([EXPECTED_HEADERS]);
+      sheet.getRange(1, 1, 1, EXPECTED_HEADERS.length).setFontWeight('bold');
+    } else {
+      // Check if headers match expected format
+      const existingHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+      const headersMatch = JSON.stringify(existingHeaders) === JSON.stringify(EXPECTED_HEADERS);
+      
+      // If headers don't match and sheet has data, update headers
+      if (!headersMatch && sheet.getLastRow() > 0) {
+        // Update headers to match new format
+        sheet.getRange(1, 1, 1, EXPECTED_HEADERS.length).setValues([EXPECTED_HEADERS]);
+        sheet.getRange(1, 1, 1, EXPECTED_HEADERS.length).setFontWeight('bold');
+      } else if (!headersMatch && sheet.getLastRow() === 0) {
+        // Sheet exists but is empty, just update headers
+        sheet.getRange(1, 1, 1, EXPECTED_HEADERS.length).setValues([EXPECTED_HEADERS]);
+        sheet.getRange(1, 1, 1, EXPECTED_HEADERS.length).setFontWeight('bold');
+      }
     }
     
-    // Check if headers exist, if not add them
+    // If sheet is empty, add headers
     if (sheet.getLastRow() === 0) {
-      sheet.getRange(1, 1, 1, 15).setValues([[
-        'Timestamp', 
-        'Name', 
-        'Email', 
-        'Gender', 
-        'Birthday', 
-        'DUPR Rating', 
-        'DUPR ID',
-        'Looking to Date',
-        'When Do You Play',
-        'Type of Partner',
-        'Partner Type',
-        'Date Gender Preference',
-        'Current Club', 
-        'City', 
-        'Country'
-      ]]);
-      sheet.getRange(1, 1, 1, 15).setFontWeight('bold');
+      sheet.getRange(1, 1, 1, EXPECTED_HEADERS.length).setValues([EXPECTED_HEADERS]);
+      sheet.getRange(1, 1, 1, EXPECTED_HEADERS.length).setFontWeight('bold');
     }
     
     // Append the data
@@ -109,7 +111,8 @@ function doPost(e) {
       data.name || '',
       data.email || '',
       data.gender || '',
-      data.birthday || '',
+      data.ageRange || '',
+      data.matchSameAgeGroup || '',
       data.duprRating || '',
       data.duprId || '',
       data.lookingToDate || '',

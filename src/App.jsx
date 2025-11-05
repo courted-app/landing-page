@@ -31,7 +31,8 @@ function App() {
     name: '', 
     email: '', 
     gender: '', 
-    birthday: '', 
+    ageRange: '', 
+    matchSameAgeGroup: '',
     duprRating: '', 
     duprId: '',
     lookingToDate: '',
@@ -100,42 +101,11 @@ function App() {
       return
     }
 
-    // Birthday validation (format: YYYY-MM-DD with 4-digit year)
-    const birthdayRegex = /^\d{4}-\d{2}-\d{2}$/
-    if (!birthdayRegex.test(formData.birthday)) {
+    // Age range validation
+    if (!formData.ageRange) {
       setMessage({
         type: 'error',
-        text: 'Please enter a valid birthday in YYYY-MM-DD format (e.g., 1990-01-15)'
-      })
-      return
-    }
-
-    // Additional birthday validation: ensure year is 4 digits and valid date
-    const [year, month, day] = formData.birthday.split('-')
-    const yearNum = parseInt(year, 10)
-    const monthNum = parseInt(month, 10)
-    const dayNum = parseInt(day, 10)
-    
-    if (year.length !== 4 || yearNum < 1900 || yearNum > new Date().getFullYear()) {
-      setMessage({
-        type: 'error',
-        text: 'Please enter a valid 4-digit year (1900 to current year)'
-      })
-      return
-    }
-
-    if (monthNum < 1 || monthNum > 12) {
-      setMessage({
-        type: 'error',
-        text: 'Please enter a valid month (01-12)'
-      })
-      return
-    }
-
-    if (dayNum < 1 || dayNum > 31) {
-      setMessage({
-        type: 'error',
-        text: 'Please enter a valid day (01-31)'
+        text: 'Please select your age range'
       })
       return
     }
@@ -180,7 +150,8 @@ function App() {
       name: formData.name,
       email: formData.email,
       gender: formData.gender,
-      birthday: formData.birthday,
+      ageRange: formData.ageRange,
+      matchSameAgeGroup: formData.matchSameAgeGroup,
       duprRating: formData.duprRating,
       duprId: formData.duprId,
       lookingToDate: formData.lookingToDate,
@@ -227,21 +198,22 @@ function App() {
         })
         setIsSubmitted(true)
         setFormData({ 
-          name: '', 
-          email: '', 
-          gender: '', 
-          birthday: '', 
-          duprRating: '', 
-          duprId: '',
-          lookingToDate: '',
-          whenDoYouPlay: [],
-          lookingFor: [],
-          dateGenderPreference: [],
-          partnerType: [],
-          currentClub: '', 
-          city: '', 
-          country: '' 
-        })
+        name: '', 
+        email: '', 
+        gender: '', 
+        ageRange: '', 
+        matchSameAgeGroup: '',
+        duprRating: '', 
+        duprId: '',
+        lookingToDate: '',
+        whenDoYouPlay: [],
+        lookingFor: [],
+        dateGenderPreference: [],
+        partnerType: [],
+        currentClub: '', 
+        city: '', 
+        country: '' 
+      })
         setLoading(false)
       }, 1000)
     } catch (error) {
@@ -310,9 +282,9 @@ function App() {
           <div className="sections-header">
             <span className="section-label">Meet.</span>
             <span className="section-label">Match.</span>
-            <span className="section-label">Courted.</span>
+            <span className="section-label">Play.</span>
           </div>
-          <p className="tagline">The #1 AI full-stack pickleball partner matching app. Spend less time searching, more time playing.</p>
+          <p className="tagline">The first AI-powered pickleball partner matching service. Spend less time searching, more time playing.</p>
           
 
           <div className="features-grid">
@@ -344,14 +316,12 @@ function App() {
         </div>
 
         <div className="hero-bottom">
-          <p className="beta-access-text">Get early access to our beta matching</p>
+          <p className="beta-access-text">Get early access to our matching services</p>
 
           <button className="cta-button" onClick={scrollToForm}>
             <span>Join the waitlist</span>
             <FiArrowDown className="arrow-icon" />
           </button>
-
-          <p className="consent-text">By joining, you agree we can email you about your matches and product updates. Beta matching currently is limited to Greater Toronto Area. </p>
         </div>
       </section>
 
@@ -364,10 +334,10 @@ function App() {
               <div className="co-founder-content">
                 <p className="co-founder-name">Christina Chin, CPA, Co-Founder</p>
                 <p className="co-founder-text">
-                  I graduated from the Schulich School of Business and spent several years at EY-Parthenon as a Management Consultant before resigning in March 2025 to pursue entrepreneurship full time. Since then, I've built multiple six-figure businesses in the pickleball industry and became the largest pickleball content creator in Canada (@pickleballonice).
+                  Christina graduated from the Schulich School of Business and spent several years at EY-Parthenon as a Management Consultant before resigning in March 2025 to pursue entrepreneurship full time. Since then, she's built multiple six-figure businesses in the pickleball industry and became the largest pickleball content creator in Canada (@pickleballonice).
                 </p>
                 <p className="co-founder-text">
-                  I played university hockey on a sports scholarship and trained toward the 2022 Beijing Winter Olympics before discovering pickleball. Now, I'm combining everything I've learned in business, sport, and storytelling to build Courted.
+                  Christina played university hockey on a sports scholarship and trained toward the 2022 Beijing Winter Olympics before discovering pickleball. Now, Christina is combining everything she's learned in business, sport, and storytelling to build Courted.
                 </p>
                 <p className="co-founder-text">
                   Let's build together!
@@ -380,10 +350,10 @@ function App() {
               <div className="co-founder-content">
                 <p className="co-founder-name">Stella Li, MSc, Co-Founder</p>
                 <p className="co-founder-text">
-                  I graduated with a Masters in Computer Science from USC Viterbi School of Engineering and currently work as a Senior Software Engineer at a unicorn tech company in San Francisco. Before that, I was a D1 NCAA soccer player on a full-ride scholarship.
+                  Stella graduated with a Masters in Computer Science from USC Viterbi School of Engineering and currently works as a Senior Software Engineer at a unicorn tech company in San Francisco. Before that, she was a D1 NCAA soccer player on a full-ride scholarship.
                 </p>
                 <p className="co-founder-text">
-                  In college, I built a website that recommends restaurants based on dietary restrictions, and that's when I realized I love creating products that help people connect in real life. I found pickleball, fell in love with the community, and saw a massive gap - finding the right partner shouldn't be left to chance.
+                  In college, Stella built a website that recommends restaurants based on dietary restrictions, and that's when she realized her love creating products that help people connect in real life. Stella found pickleball, fell in love with the community, and saw a massive gap - finding the right partner shouldn't be left to chance.
                 </p>
               </div>
             </div>
@@ -463,20 +433,26 @@ function App() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="birthday" className="form-label">
+              <label htmlFor="ageRange" className="form-label">
                 <FiCalendar className="label-icon" />
-                <span>Birthday</span>
+                <span>Age Range</span>
               </label>
-              <input
-                type="date"
-                id="birthday"
-                name="birthday"
-                value={formData.birthday}
+              <select
+                id="ageRange"
+                name="ageRange"
+                value={formData.ageRange}
                 onChange={handleChange}
                 required
                 className="form-input"
-                max={new Date().toISOString().split('T')[0]}
-              />
+              >
+                <option value="">Select age range</option>
+                <option value="18-24">18-24</option>
+                <option value="25-34">25-34</option>
+                <option value="35-44">35-44</option>
+                <option value="45-54">45-54</option>
+                <option value="55-64">55-64</option>
+                <option value="65+">65+</option>
+              </select>
             </div>
 
             <div className="form-group">
@@ -528,6 +504,34 @@ function App() {
                 className="form-input"
                 required
               />
+            </div>
+
+            <div className="form-group full-width">
+              <label className="form-label">
+                <span>Match with someone in your age range?</span>
+              </label>
+              <div className="radio-group">
+                <label className="radio-option">
+                  <input
+                    type="radio"
+                    name="matchSameAgeGroup"
+                    value="Yes"
+                    checked={formData.matchSameAgeGroup === 'Yes'}
+                    onChange={handleChange}
+                  />
+                  <span>Yes</span>
+                </label>
+                <label className="radio-option">
+                  <input
+                    type="radio"
+                    name="matchSameAgeGroup"
+                    value="No"
+                    checked={formData.matchSameAgeGroup === 'No'}
+                    onChange={handleChange}
+                  />
+                  <span>No</span>
+                </label>
+              </div>
             </div>
 
             <div className="form-group full-width">
@@ -706,6 +710,8 @@ function App() {
               {message.text}
             </div>
           )}
+
+          <p className="consent-text">By joining, you agree to receive emails from us about our product updates and your personalized player matches. Due to the popular demand, our matching services are currently limited to the Greater Toronto Area.</p>
         </div>
           </>
         )}
