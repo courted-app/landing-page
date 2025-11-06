@@ -119,7 +119,7 @@
 }
 
 .logo {
-  max-width: 180px;
+  max-width: 220px;
   width: 100%;
   height: auto;
   display: block;
@@ -134,7 +134,7 @@
   margin: 0 0 25px;
   letter-spacing: 0.5px;
   line-height: 1.4;
-  max-width: 700px;
+  max-width: 600px;
 }
 
 .sections-header {
@@ -716,13 +716,15 @@ select.form-input:focus {
   }
 
   .logo {
-    max-width: 140px;
+    max-width: 200px;
     margin: 0 auto 15px;
   }
 
   .tagline {
-    font-size: 0.95rem;
-    margin: 0 0 18px;
+    font-size: 0.8rem;
+    margin: 0 0 35px;
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
   .sections-header {
@@ -889,13 +891,13 @@ select.form-input:focus {
   }
 
   .logo {
-    max-width: 130px;
+    max-width: 180px;
     margin: 0 auto 12px;
   }
 
   .tagline {
     font-size: 0.9rem;
-    margin: 0 0 15px;
+    margin: 0 0 30px;
   }
 
   .sections-header {
@@ -1018,7 +1020,7 @@ select.form-input:focus {
   }
 
   .logo {
-    max-width: 160px;
+    max-width: 240px;
     margin: 0 auto 18px;
   }
 
@@ -1084,7 +1086,7 @@ select.form-input:focus {
 
 @media (max-width: 480px) {
   .tagline {
-    font-size: 1.2rem;
+    font-size: 0.9rem;
   }
 
   .sections-header {
