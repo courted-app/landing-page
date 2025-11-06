@@ -663,7 +663,7 @@ function App() {
               {formData.lookingToDate === 'Yes' && (
                 <div className="form-group inline-radio-group">
                   <label className="form-label">
-                    <span>Preference <span className="label-hint">(Select all that apply)</span></span>
+                    <span>Dating Preference <span className="label-hint">(Select all that apply)</span></span>
                   </label>
                   <div className="checkbox-group">
                     <label className="checkbox-option">
