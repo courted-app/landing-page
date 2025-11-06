@@ -1239,15 +1239,21 @@ select.form-input:focus {
 .footer-container {
   max-width: 1200px;
   margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  position: relative;
 }
 
 .footer-content {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 30px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
+  flex: 1;
 }
 
 .footer-brand {
@@ -1263,7 +1269,7 @@ select.form-input:focus {
   display: flex;
   gap: 30px;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .footer-link {
@@ -1275,6 +1281,7 @@ select.form-input:focus {
   font-size: 0.9rem;
   font-weight: 400;
   transition: color 0.3s ease;
+  white-space: nowrap;
 }
 
 .footer-link:hover {
@@ -1287,8 +1294,13 @@ select.form-input:focus {
 
 .footer-bottom {
   text-align: center;
-  padding-top: 20px;
-  border-top: 1px solid rgba(11, 61, 46, 0.1);
+  padding-top: 0;
+  border-top: none;
+  flex-shrink: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
 }
 
 .footer-copyright {
@@ -1303,9 +1315,18 @@ select.form-input:focus {
     padding: 30px 15px 15px;
   }
 
+  .footer-container {
+    flex-direction: column;
+    gap: 20px;
+    position: static;
+  }
+
   .footer-content {
     justify-content: center;
     gap: 25px;
+    margin-bottom: 0;
+    flex: none;
+    width: 100%;
   }
 
   .footer-links {
@@ -1317,5 +1338,15 @@ select.form-input:focus {
 
   .footer-link {
     justify-content: center;
+  }
+
+  .footer-bottom {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid rgba(11, 61, 46, 0.1);
+    width: 100%;
+    position: static;
+    left: auto;
+    transform: none;
   }
 }
