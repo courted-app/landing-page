@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { FiArrowDown, FiMail, FiUser, FiCalendar, FiMapPin, FiGlobe, FiAward, FiHome, FiUsers, FiInstagram } from 'react-icons/fi'
+import { FiArrowDown, FiMail, FiUser, FiCalendar, FiMapPin, FiGlobe, FiAward, FiHome, FiUsers, FiInstagram, FiBook } from 'react-icons/fi'
 import { IoCheckmarkCircleOutline, IoTrophyOutline } from 'react-icons/io5'
 import logo from './assets/images/courted-long-logo.png'
 import christinaImg from './assets/images/christie-co-founder.png'
@@ -32,10 +32,14 @@ function App() {
     email: '', 
     gender: '', 
     ageRange: '', 
-    matchSameAgeGroup: '',
+    partnerAgeRangeMin: 18,
+    partnerAgeRangeMax: 80,
     duprRating: '', 
     duprId: '',
     lookingToDate: '',
+    education: '',
+    datingAgeRangeMin: 18,
+    datingAgeRangeMax: 65,
     whenDoYouPlay: [],
     lookingFor: [],
     dateGenderPreference: [],
@@ -143,6 +147,31 @@ function App() {
       return
     }
 
+    // Validate dating fields if looking to date
+    if (formData.lookingToDate === 'Yes') {
+      if (!formData.education) {
+        setMessage({
+          type: 'error',
+          text: 'Please select your education level'
+        })
+        return
+      }
+      if (!formData.datingAgeRangeMin || !formData.datingAgeRangeMax) {
+        setMessage({
+          type: 'error',
+          text: 'Please set your dating age range'
+        })
+        return
+      }
+      if (formData.datingAgeRangeMin > formData.datingAgeRangeMax) {
+        setMessage({
+          type: 'error',
+          text: 'Minimum age cannot be greater than maximum age'
+        })
+        return
+      }
+    }
+
     setLoading(true)
     setMessage({ type: '', text: '' })
 
@@ -151,10 +180,14 @@ function App() {
       email: formData.email,
       gender: formData.gender,
       ageRange: formData.ageRange,
-      matchSameAgeGroup: formData.matchSameAgeGroup,
+      matchSameAgeGroup: `${formData.partnerAgeRangeMin}-${formData.partnerAgeRangeMax}`,
       duprRating: formData.duprRating,
       duprId: formData.duprId,
       lookingToDate: formData.lookingToDate,
+      education: formData.education || '',
+      datingAgeRange: formData.lookingToDate === 'Yes' 
+        ? `${formData.datingAgeRangeMin}-${formData.datingAgeRangeMax}` 
+        : '',
       whenDoYouPlay: formData.whenDoYouPlay.join(', '),
       lookingFor: formData.lookingFor.join(', '),
       dateGenderPreference: formData.dateGenderPreference.join(', '),
@@ -202,10 +235,15 @@ function App() {
         email: '', 
         gender: '', 
         ageRange: '', 
+        partnerAgeRangeMin: 18,
+        partnerAgeRangeMax: 80,
         matchSameAgeGroup: '',
         duprRating: '', 
         duprId: '',
         lookingToDate: '',
+        education: '',
+        datingAgeRangeMin: 18,
+        datingAgeRangeMax: 65,
         whenDoYouPlay: [],
         lookingFor: [],
         dateGenderPreference: [],
@@ -511,29 +549,53 @@ function App() {
 
             <div className="form-group full-width">
               <label className="form-label">
-                <span>Match with someone in your age range?</span>
+                <FiCalendar className="label-icon" />
+                <span>Preferred Partner Age Range</span>
               </label>
-              <div className="radio-group">
-                <label className="radio-option">
+              <div className="age-range-slider-container">
+                <div className="age-range-display">
+                  <span className="age-value">{formData.partnerAgeRangeMin}</span>
+                  <span className="age-separator">-</span>
+                  <span className="age-value">{formData.partnerAgeRangeMax}</span>
+                </div>
+                <div className="dual-range-slider">
                   <input
-                    type="radio"
-                    name="matchSameAgeGroup"
-                    value="Yes"
-                    checked={formData.matchSameAgeGroup === 'Yes'}
-                    onChange={handleChange}
+                    type="range"
+                    id="partnerAgeRangeMin"
+                    name="partnerAgeRangeMin"
+                    min="18"
+                    max="80"
+                    value={formData.partnerAgeRangeMin}
+                    onChange={(e) => {
+                      const minValue = parseInt(e.target.value)
+                      if (minValue <= formData.partnerAgeRangeMax) {
+                        setFormData(prev => ({
+                          ...prev,
+                          partnerAgeRangeMin: minValue
+                        }))
+                      }
+                    }}
+                    className="age-range-slider slider-min"
                   />
-                  <span>Yes</span>
-                </label>
-                <label className="radio-option">
                   <input
-                    type="radio"
-                    name="matchSameAgeGroup"
-                    value="No"
-                    checked={formData.matchSameAgeGroup === 'No'}
-                    onChange={handleChange}
+                    type="range"
+                    id="partnerAgeRangeMax"
+                    name="partnerAgeRangeMax"
+                    min="18"
+                    max="80"
+                    value={formData.partnerAgeRangeMax}
+                    onChange={(e) => {
+                      const maxValue = parseInt(e.target.value)
+                      if (maxValue >= formData.partnerAgeRangeMin) {
+                        setFormData(prev => ({
+                          ...prev,
+                          partnerAgeRangeMax: maxValue
+                        }))
+                      }
+                    }}
+                    className="age-range-slider slider-max"
                   />
-                  <span>No</span>
-                </label>
+                </div>
               </div>
             </div>
 
@@ -690,6 +752,84 @@ function App() {
                 </div>
               )}
             </div>
+
+            {formData.lookingToDate === 'Yes' && (
+              <>
+                <div className="form-group full-width">
+                  <label htmlFor="education" className="form-label">
+                    <FiBook className="label-icon" />
+                    <span>Education</span>
+                  </label>
+                  <select
+                    id="education"
+                    name="education"
+                    value={formData.education}
+                    onChange={handleChange}
+                    required
+                    className="form-input"
+                  >
+                    <option value="">Select education level</option>
+                    <option value="High School">High School</option>
+                    <option value="Some College">College</option>
+                    <option value="Bachelor's Degree">University</option>
+                    <option value="Master's Degree">Graduate</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
+
+                <div className="form-group full-width">
+                  <label htmlFor="datingAgeRange" className="form-label">
+                    <FiCalendar className="label-icon" />
+                    <span>Dating Age Range</span>
+                  </label>
+                  <div className="age-range-slider-container">
+                    <div className="age-range-display">
+                      <span className="age-value">{formData.datingAgeRangeMin}</span>
+                      <span className="age-separator">-</span>
+                      <span className="age-value">{formData.datingAgeRangeMax}</span>
+                    </div>
+                    <div className="dual-range-slider">
+                      <input
+                        type="range"
+                        id="datingAgeRangeMin"
+                        name="datingAgeRangeMin"
+                        min="18"
+                        max="80"
+                        value={formData.datingAgeRangeMin}
+                        onChange={(e) => {
+                          const minValue = parseInt(e.target.value)
+                          if (minValue <= formData.datingAgeRangeMax) {
+                            setFormData(prev => ({
+                              ...prev,
+                              datingAgeRangeMin: minValue
+                            }))
+                          }
+                        }}
+                        className="age-range-slider slider-min"
+                      />
+                      <input
+                        type="range"
+                        id="datingAgeRangeMax"
+                        name="datingAgeRangeMax"
+                        min="18"
+                        max="80"
+                        value={formData.datingAgeRangeMax}
+                        onChange={(e) => {
+                          const maxValue = parseInt(e.target.value)
+                          if (maxValue >= formData.datingAgeRangeMin) {
+                            setFormData(prev => ({
+                              ...prev,
+                              datingAgeRangeMax: maxValue
+                            }))
+                          }
+                        }}
+                        className="age-range-slider slider-max"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
 
 
             <button

@@ -16,7 +16,7 @@
 
 // Replace with your Google Sheet ID (found in the URL)
 const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID_HERE';
-const SHEET_NAME = 'Waitlist'; // Name of the sheet tab - updated with new headers
+const SHEET_NAME = 'Waitlist V2'; // Name of the sheet tab - updated with new headers
 
 // Expected headers in the correct order
 const EXPECTED_HEADERS = [
@@ -29,6 +29,8 @@ const EXPECTED_HEADERS = [
   'DUPR Rating',
   'DUPR ID',
   'Looking to Date',
+  'Education',
+  'Dating Age Range',
   'When Do You Play',
   'Type of Partner',
   'Partner Type',
@@ -116,6 +118,8 @@ function doPost(e) {
       data.duprRating || '',
       data.duprId || '',
       data.lookingToDate || '',
+      data.education || '',
+      data.datingAgeRange || '',
       data.whenDoYouPlay || '',
       data.lookingFor || '',
       data.partnerType || '',

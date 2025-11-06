@@ -504,6 +504,12 @@
   font-style: italic;
 }
 
+.required-asterisk {
+  color: #C19A3B;
+  font-weight: 500;
+  margin-left: 2px;
+}
+
 .label-icon {
   color: #C19A3B;
   font-size: 1.1rem;
@@ -588,6 +594,173 @@ select.form-input:focus {
 .radio-option:has(input:disabled) {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* Age Range Slider Styles */
+.age-range-slider-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.age-range-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #0B3D2E;
+  padding: 5px 0;
+}
+
+.age-value {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #0B3D2E;
+  min-width: 40px;
+  text-align: center;
+}
+
+.age-separator {
+  font-size: 1.2rem;
+  color: rgba(11, 61, 46, 0.6);
+}
+
+.age-range-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.dual-range-slider {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  margin-top: 5px;
+}
+
+.dual-range-slider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: rgba(11, 61, 46, 0.1);
+  border-radius: 3px;
+  z-index: 0;
+}
+
+.dual-range-slider .age-range-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: transparent;
+  pointer-events: none;
+  margin: 0;
+}
+
+.dual-range-slider .slider-min {
+  z-index: 2;
+}
+
+.dual-range-slider .slider-max {
+  z-index: 1;
+}
+
+.dual-range-slider .slider-min::-webkit-slider-thumb {
+  pointer-events: all;
+  z-index: 3;
+  position: relative;
+}
+
+.dual-range-slider .slider-max::-webkit-slider-thumb {
+  pointer-events: all;
+  z-index: 3;
+  position: relative;
+}
+
+.dual-range-slider .slider-min::-moz-range-thumb {
+  pointer-events: all;
+  z-index: 3;
+  position: relative;
+}
+
+.dual-range-slider .slider-max::-moz-range-thumb {
+  pointer-events: all;
+  z-index: 3;
+  position: relative;
+}
+
+.age-slider-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.age-slider-label {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: rgba(11, 61, 46, 0.7);
+  margin-bottom: 0;
+}
+
+.age-range-slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(11, 61, 46, 0.1);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.age-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0B3D2E;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.age-range-slider::-webkit-slider-thumb:hover {
+  background: #0a3528;
+  transform: scale(1.1);
+}
+
+.age-range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0B3D2E;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.age-range-slider::-moz-range-thumb:hover {
+  background: #0a3528;
+  transform: scale(1.1);
+}
+
+.age-range-slider:focus {
+  outline: none;
+}
+
+.age-range-slider:focus::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px rgba(11, 61, 46, 0.2);
+}
+
+.age-range-slider:focus::-moz-range-thumb {
+  box-shadow: 0 0 0 3px rgba(11, 61, 46, 0.2);
 }
 
 .checkbox-group {
