@@ -28,7 +28,8 @@ const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || ''
 
 function App() {
   const [formData, setFormData] = useState({ 
-    name: '', 
+    firstName: '', 
+    lastName: '', 
     email: '', 
     gender: '', 
     ageRange: '', 
@@ -176,7 +177,7 @@ function App() {
     setMessage({ type: '', text: '' })
 
     const data = {
-      name: formData.name,
+      name: `${formData.firstName} ${formData.lastName}`.trim(),
       email: formData.email,
       gender: formData.gender,
       ageRange: formData.ageRange,
@@ -231,7 +232,8 @@ function App() {
         })
         setIsSubmitted(true)
         setFormData({ 
-        name: '', 
+        firstName: '', 
+        lastName: '', 
         email: '', 
         gender: '', 
         ageRange: '', 
@@ -418,19 +420,36 @@ function App() {
             <h4 className="form-section-title">Court chemistry starts here</h4>
             <div className="form-container">
               <form onSubmit={handleSubmit} className="form">
-            <div className="form-group full-width">
-              <label htmlFor="name" className="form-label">
+            <div className="form-group">
+              <label htmlFor="firstName" className="form-label">
                 <FiUser className="label-icon" />
-                <span>Name</span>
+                <span>First Name</span>
               </label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
                 onChange={handleChange}
                 required
-                placeholder="Enter your name"
+                placeholder="Enter your first name"
+                className="form-input"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="lastName" className="form-label">
+                <FiUser className="label-icon" />
+                <span>Last Name</span>
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                required
+                placeholder="Enter your last name"
                 className="form-input"
               />
             </div>
