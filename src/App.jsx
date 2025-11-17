@@ -1,9 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
-import { FiArrowDown, FiMail, FiUser, FiCalendar, FiMapPin, FiGlobe, FiAward, FiHome, FiUsers, FiInstagram, FiBook } from 'react-icons/fi'
+import { useState, useEffect } from 'react'
+import { FiArrowDown, FiMail, FiUser, FiCalendar, FiAward, FiHome, FiUsers, FiInstagram, FiBook, FiCreditCard, FiExternalLink } from 'react-icons/fi'
 import { IoCheckmarkCircleOutline, IoTrophyOutline } from 'react-icons/io5'
 import logo from './assets/images/courted-long-logo.png'
 import christinaImg from './assets/images/christie-co-founder.png'
 import stellaImg from './assets/images/stella-co-founder.png'
+import eventImage from './assets/images/courtedxhisportsstouffville.png'
+import dillPickleEventImage from './assets/images/courtedxdill.png'
+import sixPickleEventImage from './assets/images/courtedx6ixpickle.png'
 import PlacesAutocomplete from './components/PlacesAutocomplete'
 import PickleballAnimation from './components/PickleballAnimation'
 import './App.css'
@@ -25,6 +28,9 @@ const ThinHeartIcon = ({ className }) => (
 
 // Google Apps Script Web App URL from environment variable
 const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || ''
+
+// Stripe Payment Link
+const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/4gMbJ1bs485b7Kl7aOeIw00'
 
 function App() {
   const [formData, setFormData] = useState({ 
@@ -53,6 +59,30 @@ function App() {
   const [message, setMessage] = useState({ type: '', text: '' })
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  const [inventory, setInventory] = useState({ available: null, totalQuantity: 0, sold: 0, loading: true })
+  const [showEventForm, setShowEventForm] = useState(false)
+  const [eventFormLoading, setEventFormLoading] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [eventFormData, setEventFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    gender: '',
+    ageRange: '',
+    preferredPartnerAgeRangeMin: 18,
+    preferredPartnerAgeRangeMax: 80,
+    duprRating: '',
+    duprId: '',
+    timeOfDay: [],
+    daysOfPlay: [],
+    fieldOfWork: '',
+    typeOfPlay: [],
+    priorities: [],
+    currentClub: '',
+    city: '',
+    country: ''
+  })
+  const [genderCounts, setGenderCounts] = useState({ male: 0, female: 0, loading: true })
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,6 +91,80 @@ function App() {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Fetch gender counts on mount and when event form opens
+  useEffect(() => {
+    const fetchGenderCounts = async () => {
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+        setGenderCounts({ male: 0, female: 0, loading: false })
+        return
+      }
+
+      try {
+        const url = `${GOOGLE_SCRIPT_URL}?action=getGenderCounts`
+        const response = await fetch(url)
+        const data = await response.json()
+        
+        if (data.success) {
+          const maleCount = data.maleCount || 0
+          const femaleCount = data.femaleCount || 0
+        
+          
+          setGenderCounts({
+            male: maleCount,
+            female: femaleCount,
+            loading: false
+          })
+        } else {
+          console.error('Failed to fetch gender counts:', data.error)
+          setGenderCounts({ male: 0, female: 0, loading: false })
+        }
+      } catch (error) {
+        console.error('Error fetching gender counts:', error)
+        setGenderCounts({ male: 0, female: 0, loading: false })
+      }
+    }
+
+    fetchGenderCounts()
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchGenderCounts, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
+  // Fetch inventory on mount and periodically
+  useEffect(() => {
+    const fetchInventory = async () => {
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+        setInventory(prev => ({ ...prev, loading: false }))
+        return
+      }
+
+      try {
+        const url = `${GOOGLE_SCRIPT_URL}?action=getInventory`
+        const response = await fetch(url)
+        const data = await response.json()
+        
+        if (data.success && data.inventory) {
+          setInventory({
+            available: data.inventory.available,
+            totalQuantity: data.inventory.totalQuantity,
+            sold: data.inventory.sold,
+            loading: false
+          })
+        } else {
+          setInventory(prev => ({ ...prev, loading: false }))
+        }
+      } catch (error) {
+        console.error('Error fetching inventory:', error)
+        setInventory(prev => ({ ...prev, loading: false }))
+      }
+    }
+
+    fetchInventory()
+    // Refresh inventory every 30 seconds
+    const interval = setInterval(fetchInventory, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   const scrollToForm = () => {
@@ -74,6 +178,15 @@ function App() {
 
   const scrollToAbout = () => {
     const aboutElement = document.getElementById('about-us')
+    if (aboutElement) {
+      const yOffset = 0
+      const y = aboutElement.getBoundingClientRect().top + window.pageYOffset + yOffset
+      window.scrollTo({ top: y, behavior: 'smooth' })
+    }
+  }
+
+  const scrollToEvents = () => {
+    const aboutElement = document.getElementById('events')
     if (aboutElement) {
       const yOffset = 0
       const y = aboutElement.getBoundingClientRect().top + window.pageYOffset + yOffset
@@ -299,6 +412,51 @@ function App() {
     }))
   }
 
+  const handleEventPlaceSelect = (placeData) => {
+    setEventFormData(prev => ({
+      ...prev,
+      currentClub: placeData.currentClub,
+      city: placeData.city,
+      country: placeData.country
+    }))
+  }
+
+  const isEventFormValid = () => {
+    // Check if gender is full
+    if (eventFormData.gender === 'Male' && genderCounts.male >= 16) {
+      return false
+    }
+    if (eventFormData.gender === 'Female' && genderCounts.female >= 16) {
+      return false
+    }
+    
+    return (
+      eventFormData.firstName.trim() !== '' &&
+      eventFormData.lastName.trim() !== '' &&
+      eventFormData.email.trim() !== '' &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(eventFormData.email) &&
+      eventFormData.gender !== '' &&
+      eventFormData.ageRange !== '' &&
+      eventFormData.duprRating !== '' &&
+      eventFormData.currentClub.trim() !== '' &&
+      eventFormData.timeOfDay.length > 0 &&
+      eventFormData.daysOfPlay.length > 0 &&
+      eventFormData.fieldOfWork.trim() !== '' &&
+      eventFormData.typeOfPlay.length > 0 &&
+      eventFormData.priorities.length > 0
+    )
+  }
+
+  const getGenderFullMessage = () => {
+    if (eventFormData.gender === 'Male' && genderCounts.male >= 16) {
+      return 'Male spots are sold out for this event.'
+    }
+    if (eventFormData.gender === 'Female' && genderCounts.female >= 16) {
+      return 'Female spots are sold out for this event.'
+    }
+    return ''
+  }
+
   return (
     <div className="app">
       <nav className="top-nav">
@@ -311,6 +469,7 @@ function App() {
           {!isScrolled && <div></div>}
           <div className="nav-links">
             <button className="nav-link" onClick={scrollToAbout}>About Us</button>
+            <button className="nav-link" onClick={scrollToEvents}>Events</button>
             <button className="nav-link" onClick={scrollToForm}>Join Waitlist</button>
           </div>
         </div>
@@ -403,6 +562,761 @@ function App() {
           </div>
         </div>
       </section>
+
+      <section id="events" className="event-section">
+        <div className="about-container">
+          <h2 className="about-title">Events</h2>
+          <div className="events-grid">
+            <div className="event-block">
+              <div className="event-left-column">
+                <div className="event-image-container">
+                  <img src={eventImage} alt="Courted Kick Off Event" className="event-image" />
+                </div>
+                <div className="event-quick-info">
+                  <p className="event-quick-info-item"><strong>Date:</strong> Saturday, November 29</p>
+                  <p className="event-quick-info-item"><strong>Time:</strong> 7:00pm to 10:00pm</p>
+                  <p className="event-quick-info-item">
+                    <strong>Location:</strong>{' '}
+                    <a 
+                      href="https://www.google.com/maps/place/Hisports+Whitchurch-Stouffville/@43.9617177,-79.2679516,17z/data=!3m1!4b1!4m6!3m5!1s0x89d529190f92972b:0xb07284eb59a2ffa4!8m2!3d43.9617177!4d-79.2653767!16s%2Fg%2F11y2qdk9wh?entry=ttu&g_ep=EgoyMDI1MTExMi4wIKXMDSoASAFQAw%3D%3D" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="event-location-link"
+                    >
+                      HISPORTS Stouffville
+                    </a>
+                  </p>
+                  <p className="event-quick-info-item"><strong>Price:</strong> $40</p>
+                </div>
+              </div>
+              <div className="event-content">
+                <h3 className="event-title">Courted Kick Off Event (HISPORTS Stouffville)</h3>
+                <div className="event-description">
+                  <p>
+                    Join us for our first-ever Courted Kickoff Event! This event is open to players in the 3.25–3.75 skill range. Registration is individual only - simply fill out the intake form, and our matching algorithm will place you on a team based on your skill level, play style, and preferences.
+                  </p>
+                  <p>
+                    You'll compete in a team-style tournament using rally scoring, designed to maximize playtime and help you meet new players in a fun, social atmosphere.
+                  </p>
+                  <p>
+                    Prizes provided by Natures Path, Neal Brothers, Crank Coffee, CturnerMedical, and OS1st. Limited spots available.
+                  </p>
+                </div>
+                {(genderCounts.male >= 16 || genderCounts.female >= 16) && (
+                  <div className="event-capacity-warning">
+                    {genderCounts.male >= 16 && (
+                      <p className="capacity-warning-text">Male spots are sold out!</p>
+                    )}
+                    {genderCounts.female >= 16 && (
+                      <p className="capacity-warning-text">Female spots are sold out!</p>
+                    )}
+                  </div>
+                )}
+                <button className="event-signup-button" onClick={() => setShowEventForm(true)}>
+                  Sign Up
+                </button>
+              </div>
+            </div>
+
+            <div className="event-block">
+              <div className="event-left-column">
+                <div className="event-image-container">
+                  <img src={dillPickleEventImage} alt="Courted x The Dill Pickleball Club" className="event-image" />
+                  <div className="coming-soon-badge-event">Coming Soon</div>
+                </div>
+                <div className="event-quick-info">
+                  <p className="event-quick-info-item"><strong>Date:</strong> TBA</p>
+                  <p className="event-quick-info-item"><strong>Time:</strong> TBA</p>
+                  <p className="event-quick-info-item">
+                    <strong>Location:</strong> The Dill Pickleball Club
+                  </p>
+                  <p className="event-quick-info-item"><strong>Price:</strong> TBA</p>
+                </div>
+              </div>
+              <div className="event-content">
+                <h3 className="event-title">Courted x The Dill Pickleball Club</h3>
+                <div className="event-description">
+                  <p>
+                    Stay tuned for our upcoming event at The Dill Pickleball Club! More details coming soon.
+                  </p>
+                </div>
+                <button className="event-signup-button" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+                  Coming Soon
+                </button>
+              </div>
+            </div>
+
+            <div className="event-block">
+              <div className="event-left-column">
+                <div className="event-image-container">
+                  <img src={sixPickleEventImage} alt="Courted x 6ixPickle" className="event-image" />
+                  <div className="coming-soon-badge-event">Coming Soon</div>
+                </div>
+                <div className="event-quick-info">
+                  <p className="event-quick-info-item"><strong>Date:</strong> TBA</p>
+                  <p className="event-quick-info-item"><strong>Time:</strong> TBA</p>
+                  <p className="event-quick-info-item">
+                    <strong>Location:</strong> 6ixPickle
+                  </p>
+                  <p className="event-quick-info-item"><strong>Price:</strong> TBA</p>
+                </div>
+              </div>
+              <div className="event-content">
+                <h3 className="event-title">Courted x 6ixPickle</h3>
+                <div className="event-description">
+                  <p>
+                    Stay tuned for our upcoming event at 6ixPickle! More details coming soon.
+                  </p>
+                </div>
+                <button className="event-signup-button" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+                  Coming Soon
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {showEventForm && (
+        <div className="event-form-modal" onClick={(e) => {
+          if (e.target === e.currentTarget) setShowEventForm(false)
+        }}>
+          <div className="event-form-modal-content">
+            <div className="event-form-header">
+              <button className="event-form-close" onClick={() => setShowEventForm(false)}>×</button>
+              <h2 className="event-form-title">Sign up Form</h2>
+            </div>
+            <div className="event-form-scrollable">
+              <form className="event-form" onSubmit={(e) => e.preventDefault()}>
+              <div className="event-form-grid">
+                <div className="event-form-group">
+                  <label htmlFor="eventFirstName" className="event-form-label">
+                    <FiUser className="label-icon" />
+                    <span>First Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="eventFirstName"
+                    name="firstName"
+                    value={eventFormData.firstName}
+                    onChange={(e) => setEventFormData({ ...eventFormData, firstName: e.target.value })}
+                    required
+                    placeholder="Enter your first name"
+                    className="event-form-input"
+                  />
+                </div>
+
+                <div className="event-form-group">
+                  <label htmlFor="eventLastName" className="event-form-label">
+                    <FiUser className="label-icon" />
+                    <span>Last Name</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="eventLastName"
+                    name="lastName"
+                    value={eventFormData.lastName}
+                    onChange={(e) => setEventFormData({ ...eventFormData, lastName: e.target.value })}
+                    required
+                    placeholder="Enter your last name"
+                    className="event-form-input"
+                  />
+                </div>
+
+                <div className="event-form-group full-width">
+                  <label htmlFor="eventEmail" className="event-form-label">
+                    <FiMail className="label-icon" />
+                    <span>Email</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="eventEmail"
+                    name="email"
+                    value={eventFormData.email}
+                    onChange={(e) => setEventFormData({ ...eventFormData, email: e.target.value })}
+                    required
+                    placeholder="Enter your email"
+                    className="event-form-input"
+                  />
+                </div>
+
+                <div className="event-form-group full-width">
+                  <label htmlFor="eventFieldOfWork" className="event-form-label">
+                    <FiBook className="label-icon" />
+                    <span>Field of Work / Study</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="eventFieldOfWork"
+                    name="fieldOfWork"
+                    value={eventFormData.fieldOfWork}
+                    onChange={(e) => setEventFormData({ ...eventFormData, fieldOfWork: e.target.value })}
+                    placeholder="Enter your field of work or study"
+                    className="event-form-input"
+                    required
+                  />
+                </div>
+
+                <div className="event-form-group">
+                  <label htmlFor="eventGender" className="event-form-label">
+                    <FiUser className="label-icon" />
+                    <span>Gender</span>
+                  </label>
+                  <select
+                    id="eventGender"
+                    name="gender"
+                    value={eventFormData.gender}
+                    onChange={(e) => setEventFormData({ ...eventFormData, gender: e.target.value })}
+                    required
+                    className="event-form-input"
+                  >
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Non-binary">Non-binary</option>
+                    <option value="Prefer not to say">Prefer not to say</option>
+                  </select>
+                </div>
+
+                <div className="event-form-group">
+                  <label htmlFor="eventAgeRange" className="event-form-label">
+                    <FiCalendar className="label-icon" />
+                    <span>Age Range</span>
+                  </label>
+                  <select
+                    id="eventAgeRange"
+                    name="ageRange"
+                    value={eventFormData.ageRange}
+                    onChange={(e) => setEventFormData({ ...eventFormData, ageRange: e.target.value })}
+                    required
+                    className="event-form-input"
+                  >
+                    <option value="">Select age range</option>
+                    <option value="18-24">18-24</option>
+                    <option value="25-34">25-34</option>
+                    <option value="35-44">35-44</option>
+                    <option value="45-54">45-54</option>
+                    <option value="55-64">55-64</option>
+                    <option value="65+">65+</option>
+                  </select>
+                </div>
+
+                <div className="event-form-group full-width">
+                  <label className="event-form-label">
+                    <FiCalendar className="label-icon" />
+                    <span>Preferred Partner Age Range (18 to 80)</span>
+                  </label>
+                  <div className="age-range-slider-container">
+                    <div className="age-range-display">
+                      <span className="age-value">{eventFormData.preferredPartnerAgeRangeMin}</span>
+                      <span className="age-separator">-</span>
+                      <span className="age-value">{eventFormData.preferredPartnerAgeRangeMax}</span>
+                    </div>
+                    <div className="dual-range-slider">
+                      <input
+                        type="range"
+                        min="18"
+                        max="80"
+                        value={eventFormData.preferredPartnerAgeRangeMin}
+                        onChange={(e) => {
+                          const minValue = parseInt(e.target.value)
+                          if (minValue <= eventFormData.preferredPartnerAgeRangeMax) {
+                            setEventFormData({ ...eventFormData, preferredPartnerAgeRangeMin: minValue })
+                          }
+                        }}
+                        className="age-range-slider slider-min"
+                      />
+                      <input
+                        type="range"
+                        min="18"
+                        max="80"
+                        value={eventFormData.preferredPartnerAgeRangeMax}
+                        onChange={(e) => {
+                          const maxValue = parseInt(e.target.value)
+                          if (maxValue >= eventFormData.preferredPartnerAgeRangeMin) {
+                            setEventFormData({ ...eventFormData, preferredPartnerAgeRangeMax: maxValue })
+                          }
+                        }}
+                        className="age-range-slider slider-max"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="event-form-group">
+                  <label htmlFor="eventDuprRating" className="event-form-label">
+                    <FiAward className="label-icon" />
+                    <span>DUPR/Self Rating</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="eventDuprRating"
+                    name="duprRating"
+                    value={eventFormData.duprRating}
+                    onChange={(e) => setEventFormData({ ...eventFormData, duprRating: e.target.value })}
+                    placeholder="Enter your DUPR rating"
+                    className="event-form-input"
+                    min="0"
+                    max="10"
+                    step="0.01"
+                    required
+                  />
+                </div>
+
+                <div className="event-form-group">
+                  <label htmlFor="eventDuprId" className="event-form-label">
+                    <FiAward className="label-icon" />
+                    <span>DUPR ID (if applicable)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="eventDuprId"
+                    name="duprId"
+                    value={eventFormData.duprId}
+                    onChange={(e) => setEventFormData({ ...eventFormData, duprId: e.target.value })}
+                    placeholder="Enter your DUPR ID"
+                    className="event-form-input"
+                  />
+                </div>
+
+                <div className="event-form-group full-width">
+                  <label htmlFor="eventCurrentClub" className="event-form-label">
+                    <FiHome className="label-icon" />
+                    <span>Current Club / City</span>
+                  </label>
+                  <PlacesAutocomplete
+                    value={eventFormData.currentClub}
+                    onChange={(e) => setEventFormData({ ...eventFormData, currentClub: e.target.value })}
+                    onPlaceSelect={handleEventPlaceSelect}
+                    placeholder="Enter your club or city"
+                    className="event-form-input"
+                    required
+                  />
+                </div>
+
+                <div className="event-form-group full-width">
+                  <label className="form-label">
+                    <span>When do you play? <span className="label-hint">(Select all that apply)</span></span>
+                  </label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        name="timeOfDay"
+                        value="Morning"
+                        checked={eventFormData.timeOfDay.includes('Morning')}
+                        onChange={(e) => {
+                          const { value, checked } = e.target
+                          setEventFormData({
+                            ...eventFormData,
+                            timeOfDay: checked
+                              ? [...eventFormData.timeOfDay, value]
+                              : eventFormData.timeOfDay.filter(t => t !== value)
+                          })
+                        }}
+                      />
+                      <span>Morning</span>
+                    </label>
+                    <label className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        name="timeOfDay"
+                        value="Afternoon"
+                        checked={eventFormData.timeOfDay.includes('Afternoon')}
+                        onChange={(e) => {
+                          const { value, checked } = e.target
+                          setEventFormData({
+                            ...eventFormData,
+                            timeOfDay: checked
+                              ? [...eventFormData.timeOfDay, value]
+                              : eventFormData.timeOfDay.filter(t => t !== value)
+                          })
+                        }}
+                      />
+                      <span>Afternoon</span>
+                    </label>
+                    <label className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        name="timeOfDay"
+                        value="Night"
+                        checked={eventFormData.timeOfDay.includes('Night')}
+                        onChange={(e) => {
+                          const { value, checked } = e.target
+                          setEventFormData({
+                            ...eventFormData,
+                            timeOfDay: checked
+                              ? [...eventFormData.timeOfDay, value]
+                              : eventFormData.timeOfDay.filter(t => t !== value)
+                          })
+                        }}
+                      />
+                      <span>Night</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="event-form-group full-width">
+                  <label className="form-label">
+                    <span>Playing availability <span className="label-hint">(Select all that apply)</span></span>
+                  </label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        name="daysOfPlay"
+                        value="Weekends"
+                        checked={eventFormData.daysOfPlay.includes('Weekends')}
+                        onChange={(e) => {
+                          const { value, checked } = e.target
+                          setEventFormData({
+                            ...eventFormData,
+                            daysOfPlay: checked
+                              ? [...eventFormData.daysOfPlay, value]
+                              : eventFormData.daysOfPlay.filter(d => d !== value)
+                          })
+                        }}
+                      />
+                      <span>Weekends</span>
+                    </label>
+                    <label className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        name="daysOfPlay"
+                        value="Weekdays"
+                        checked={eventFormData.daysOfPlay.includes('Weekdays')}
+                        onChange={(e) => {
+                          const { value, checked } = e.target
+                          setEventFormData({
+                            ...eventFormData,
+                            daysOfPlay: checked
+                              ? [...eventFormData.daysOfPlay, value]
+                              : eventFormData.daysOfPlay.filter(d => d !== value)
+                          })
+                        }}
+                      />
+                      <span>Weekdays</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="event-form-group full-width">
+                  <label className="form-label">
+                    <span>Type of Rallies <span className="label-hint">(Select all that apply)</span></span>
+                  </label>
+                  <div className="checkbox-group">
+                    <label className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        name="typeOfPlay"
+                        value="Drills"
+                        checked={eventFormData.typeOfPlay.includes('Drills')}
+                        onChange={(e) => {
+                          const { value, checked } = e.target
+                          setEventFormData({
+                            ...eventFormData,
+                            typeOfPlay: checked
+                              ? [...eventFormData.typeOfPlay, value]
+                              : eventFormData.typeOfPlay.filter(t => t !== value)
+                          })
+                        }}
+                      />
+                      <span>Drills</span>
+                    </label>
+                    <label className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        name="typeOfPlay"
+                        value="Doubles/Mixed Games"
+                        checked={eventFormData.typeOfPlay.includes('Doubles/Mixed Games')}
+                        onChange={(e) => {
+                          const { value, checked } = e.target
+                          setEventFormData({
+                            ...eventFormData,
+                            typeOfPlay: checked
+                              ? [...eventFormData.typeOfPlay, value]
+                              : eventFormData.typeOfPlay.filter(t => t !== value)
+                          })
+                        }}
+                      />
+                      <span>Doubles/Mixed Games</span>
+                    </label>
+                    <label className="checkbox-option">
+                      <input
+                        type="checkbox"
+                        name="typeOfPlay"
+                        value="Singles Games"
+                        checked={eventFormData.typeOfPlay.includes('Singles Games')}
+                        onChange={(e) => {
+                          const { value, checked } = e.target
+                          setEventFormData({
+                            ...eventFormData,
+                            typeOfPlay: checked
+                              ? [...eventFormData.typeOfPlay, value]
+                              : eventFormData.typeOfPlay.filter(t => t !== value)
+                          })
+                        }}
+                      />
+                      <span>Singles Games</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="event-form-group full-width">
+                  <label className="event-form-label">
+                    Prioritize the following: (Stack them in order of importance)
+                  </label>
+                  <div className="priorities-list">
+                    {(() => {
+                      const allPriorities = ['Winning', 'Having Fun', 'Professional Networking', 'Post-Pickleball Party', 'Meeting new players in the community', 'Health and Well-being']
+                      // Sort: ranked items first (in their ranked order), then unranked items
+                      const sortedPriorities = [
+                        ...eventFormData.priorities,
+                        ...allPriorities.filter(p => !eventFormData.priorities.includes(p))
+                      ]
+                      
+                      return sortedPriorities.map((priority) => {
+                        const currentRank = eventFormData.priorities.findIndex(p => p === priority) + 1
+                        const isRanked = currentRank > 0
+                        
+                        const moveUp = () => {
+                          if (currentRank > 1) {
+                            const newPriorities = [...eventFormData.priorities]
+                            const currentIndex = currentRank - 1
+                            const temp = newPriorities[currentIndex]
+                            newPriorities[currentIndex] = newPriorities[currentIndex - 1]
+                            newPriorities[currentIndex - 1] = temp
+                            setEventFormData({ ...eventFormData, priorities: newPriorities })
+                          }
+                        }
+                        
+                        const moveDown = () => {
+                          if (currentRank > 0 && currentRank < eventFormData.priorities.length) {
+                            const newPriorities = [...eventFormData.priorities]
+                            const currentIndex = currentRank - 1
+                            const temp = newPriorities[currentIndex]
+                            newPriorities[currentIndex] = newPriorities[currentIndex + 1]
+                            newPriorities[currentIndex + 1] = temp
+                            setEventFormData({ ...eventFormData, priorities: newPriorities })
+                          }
+                        }
+                        
+                        const addToRanking = () => {
+                          setEventFormData({
+                            ...eventFormData,
+                            priorities: [...eventFormData.priorities, priority]
+                          })
+                        }
+                        
+                        const removeFromRanking = () => {
+                          setEventFormData({
+                            ...eventFormData,
+                            priorities: eventFormData.priorities.filter(p => p !== priority)
+                          })
+                        }
+                        
+                        return (
+                          <div key={priority} className={`priority-item ${isRanked ? 'priority-item-ranked' : 'priority-item-unranked'}`}>
+                            <div className="priority-content">
+                              {isRanked ? (
+                                <>
+                                  <div className="priority-rank-badge">{currentRank}</div>
+                                  <span className="priority-text">{priority}</span>
+                                  <div className="priority-controls">
+                                    <button
+                                      type="button"
+                                      className="priority-btn priority-btn-up"
+                                      onClick={moveUp}
+                                      disabled={currentRank === 1}
+                                      title="Move up"
+                                    >
+                                      ↑
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="priority-btn priority-btn-down"
+                                      onClick={moveDown}
+                                      disabled={currentRank === eventFormData.priorities.length}
+                                      title="Move down"
+                                    >
+                                      ↓
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="priority-btn priority-btn-remove"
+                                      onClick={removeFromRanking}
+                                      title="Remove from ranking"
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="priority-text priority-text-unranked">{priority}</span>
+                                  <button
+                                    type="button"
+                                    className="priority-btn priority-btn-add"
+                                    onClick={addToRanking}
+                                    title="Add to ranking"
+                                  >
+                                    +
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })
+                    })()}
+                  </div>
+                  {eventFormData.priorities.length > 0 && (
+                    <div className="priority-summary">
+                      <p className="priority-summary-text">
+                        Current ranking: {eventFormData.priorities.map((p, i) => (
+                          <span key={p} className="priority-summary-item">
+                            {i + 1}. {p}
+                          </span>
+                        ))}
+                      </p>
+                    </div>
+                  )}
+                  {eventFormData.priorities.length === 0 && (
+                    <div className="event-form-error-message" style={{ marginTop: '10px' }}>
+                      Please select at least one priority to rank.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {getGenderFullMessage() && (
+                <div className="event-form-error-message">
+                  {getGenderFullMessage()}
+                </div>
+              )}
+              <button
+                type="button"
+                className="event-pay-button"
+                disabled={!isEventFormValid() || eventFormLoading}
+                onClick={() => {
+                  if (isEventFormValid()) {
+                    setEventFormLoading(true)
+                    
+                    // Prepare data
+                    const data = {
+                      formType: 'event',
+                      firstName: eventFormData.firstName,
+                      lastName: eventFormData.lastName,
+                      email: eventFormData.email,
+                      gender: eventFormData.gender,
+                      ageRange: eventFormData.ageRange,
+                      preferredPartnerAgeRangeMin: eventFormData.preferredPartnerAgeRangeMin,
+                      preferredPartnerAgeRangeMax: eventFormData.preferredPartnerAgeRangeMax,
+                      duprRating: eventFormData.duprRating,
+                      duprId: eventFormData.duprId,
+                      timeOfDay: eventFormData.timeOfDay,
+                      daysOfPlay: eventFormData.daysOfPlay,
+                      fieldOfWork: eventFormData.fieldOfWork,
+                      typeOfPlay: eventFormData.typeOfPlay,
+                      priorities: eventFormData.priorities,
+                      currentClub: eventFormData.currentClub,
+                      city: eventFormData.city,
+                      country: eventFormData.country,
+                      timestamp: new Date().toISOString()
+                    }
+                    
+                    // Save form data to Google Sheets in the background (non-blocking)
+                    if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'YOUR_GOOGLE_SCRIPT_URL_HERE') {
+                      // Send request without waiting for response (optimistic update)
+                      // Since we're using no-cors mode, we can't read the response anyway
+                      fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                      }).catch(err => {
+                        // Silently handle errors - data is sent, we just can't verify
+                        console.log('Background submission:', err)
+                      })
+                    }
+                    
+                    // Show loading for 1 second, then clear form, show modal, and redirect to Stripe
+                    setTimeout(() => {
+                      // Clear form data
+                      setEventFormData({
+                        firstName: '',
+                        lastName: '',
+                        email: '',
+                        gender: '',
+                        ageRange: '',
+                        preferredPartnerAgeRangeMin: 18,
+                        preferredPartnerAgeRangeMax: 80,
+                        duprRating: '',
+                        duprId: '',
+                        timeOfDay: [],
+                        daysOfPlay: [],
+                        fieldOfWork: '',
+                        typeOfPlay: [],
+                        priorities: [],
+                        currentClub: '',
+                        city: '',
+                        country: ''
+                      })
+                      
+                      // Close event form and show payment modal
+                      setShowEventForm(false)
+                      setShowPaymentModal(true)
+                      setEventFormLoading(false)
+                      
+                      // Open Stripe payment link
+                      window.open(STRIPE_PAYMENT_LINK, '_blank', 'noopener,noreferrer')
+                    }, 1000)
+                  }
+                }}
+              >
+                <FiCreditCard className="pay-icon" />
+                <span>{eventFormLoading ? 'Processing...' : 'Pay Now'}</span>
+                {!eventFormLoading && <FiExternalLink className="external-icon" />}
+              </button>
+            </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showPaymentModal && (
+        <div className="event-form-modal" onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowPaymentModal(false)
+            setShowEventForm(false)
+          }
+        }}>
+          <div className="event-form-modal-content">
+            <button className="event-form-close" onClick={() => {
+              setShowPaymentModal(false)
+              setShowEventForm(false)
+            }}>×</button>
+            <h2 className="event-form-title">Payment Processing</h2>
+            <div style={{ padding: '20px 0', textAlign: 'center' }}>
+              <p style={{ fontSize: '16px', lineHeight: '1.6', marginBottom: '20px' }}>
+              Please complete your payment in the Stripe checkout window. Once your payment is confirmed, you'll receive a confirmation email.
+              </p>
+              <button 
+                className="event-signup-button" 
+                onClick={() => {
+                  setShowPaymentModal(false)
+                  setShowEventForm(false)
+                }}
+                style={{ marginTop: '30px' }}
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section id="waitlist-form" className="form-section">
         {isSubmitted ? (
