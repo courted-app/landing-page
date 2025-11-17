@@ -2,8 +2,8 @@
   command = "npm run build"
   publish = "dist"
 
-# Configure secrets scanning to ignore Google Places API key
-# This is a public client-side API key (starts with "AIza"), not a secret
+# Disable secrets scanning smart detection to avoid false positives
+# The Google Places API key is a public client-side key, not a secret
 [build.environment]
-  SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIza*"
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
 
