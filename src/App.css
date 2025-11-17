@@ -638,7 +638,7 @@
   position: sticky;
   top: 0;
   background: white;
-  padding: 0px;
+  padding: 24px 50px 20px;
   z-index: 10;
   border-bottom: 1px solid rgba(11, 61, 46, 0.1);
 }
@@ -646,7 +646,7 @@
 .event-form-scrollable {
   overflow-y: auto;
   flex: 1;
-  padding-top: 10px;
+  padding: 10px 50px 40px;
 }
 
 .event-form-close {
@@ -1375,6 +1375,14 @@ select.form-input:focus {
   .event-form-group.full-width {
     grid-column: 1 !important;
   }
+
+  .event-form-header {
+    padding: 24px 30px 20px;
+  }
+
+  .event-form-scrollable {
+    padding: 10px 30px 40px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1516,8 +1524,15 @@ select.form-input:focus {
   }
 
   .event-form-modal-content {
-    padding: 30px 20px;
     max-height: 95vh;
+  }
+
+  .event-form-header {
+    padding: 24px 20px 20px;
+  }
+
+  .event-form-scrollable {
+    padding: 10px 20px 30px;
   }
 
   .event-form-title {
