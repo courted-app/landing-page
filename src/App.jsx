@@ -1202,6 +1202,15 @@ function App() {
                   if (isEventFormValid()) {
                     setEventFormLoading(true)
                     
+                    // Open Stripe payment link immediately (must be in direct response to user click for mobile)
+                    // On mobile, open in same tab; on desktop, open in new tab
+                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768
+                    if (isMobile) {
+                      window.location.href = STRIPE_PAYMENT_LINK
+                    } else {
+                      window.open(STRIPE_PAYMENT_LINK, '_blank', 'noopener,noreferrer')
+                    }
+                    
                     // Prepare data
                     const data = {
                       formType: 'event',
@@ -1242,7 +1251,7 @@ function App() {
                       })
                     }
                     
-                    // Show loading for 1 second, then clear form, show modal, and redirect to Stripe
+                    // Show loading for 1 second, then clear form and show modal
                     setTimeout(() => {
                       // Clear form data
                       setEventFormData({
@@ -1269,9 +1278,6 @@ function App() {
                       setShowEventForm(false)
                       setShowPaymentModal(true)
                       setEventFormLoading(false)
-                      
-                      // Open Stripe payment link
-                      window.open(STRIPE_PAYMENT_LINK, '_blank', 'noopener,noreferrer')
                     }, 1000)
                   }
                 }}
