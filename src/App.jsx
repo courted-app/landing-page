@@ -1337,7 +1337,7 @@ function App() {
           </div>
         ) : (
           <>
-            <h4 className="form-section-title">Court chemistry starts here</h4>
+            <h4 className="form-section-title">Don't see an event near you? Join the Waitlist!</h4>
             <div className="form-container">
               <form onSubmit={handleSubmit} className="form">
             <div className="form-group">
@@ -1780,8 +1780,7 @@ function App() {
                 <span>Submitting...</span>
               ) : (
                 <>
-                  <span>Submit</span>
-                  <IoCheckmarkCircleOutline className="submit-icon" />
+                  <span>Join Now</span>
                 </>
               )}
             </button>
