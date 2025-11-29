@@ -621,34 +621,6 @@ function App() {
             <div className="event-block">
               <div className="event-left-column">
                 <div className="event-image-container">
-                  <img src={dillPickleEventImage} alt="Courted x The Dill Pickleball Club" className="event-image" />
-                  <div className="coming-soon-badge-event">Coming Soon</div>
-                </div>
-                <div className="event-quick-info">
-                  <p className="event-quick-info-item"><strong>Date:</strong> TBA</p>
-                  <p className="event-quick-info-item"><strong>Time:</strong> TBA</p>
-                  <p className="event-quick-info-item">
-                    <strong>Location:</strong> The Dill Pickleball Club
-                  </p>
-                  <p className="event-quick-info-item"><strong>Price:</strong> TBA</p>
-                </div>
-              </div>
-              <div className="event-content">
-                <h3 className="event-title">Courted x The Dill Pickleball Club</h3>
-                <div className="event-description">
-                  <p>
-                    Stay tuned for our upcoming event at The Dill Pickleball Club! More details coming soon.
-                  </p>
-                </div>
-                <button className="event-signup-button" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-                  Coming Soon
-                </button>
-              </div>
-            </div>
-
-            <div className="event-block">
-              <div className="event-left-column">
-                <div className="event-image-container">
                   <img src={sixPickleEventImage} alt="Courted x 6ixPickle" className="event-image" />
                   <div className="coming-soon-badge-event">Coming Soon</div>
                 </div>
